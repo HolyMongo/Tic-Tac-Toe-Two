@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class PlacePieces : MonoBehaviour
 {
@@ -8,12 +9,18 @@ public class PlacePieces : MonoBehaviour
     [SerializeField] private GameObject oPiece;
     [SerializeField] private GameObject currentPiece;
 
+    [SerializeField] private TextMeshProUGUI turnNumberText;
+    [SerializeField] private TextMeshProUGUI turnText;
+
 
     [SerializeField] private List<GameObject> boardPieces;
-    private int boardPieceToMoveTo;
+    [SerializeField] private int boardPieceToMoveTo;
 
     private bool xTurnToPlace;
     private int turnNumber;
+
+    [SerializeField] GameObject test1;
+    [SerializeField] GameObject test2;
 
     [SerializeField] private Vector3 mousePos;
     [SerializeField] private Vector3 mouseWorldPos;
@@ -36,50 +43,80 @@ public class PlacePieces : MonoBehaviour
             currentPiece = oPiece;
         }
         inputActions = new PlayerInputsActions();
+        Debug.Log("Creates it!");
         inputActions.InGame.Enable();
+        Debug.Log("Enables it!");
         inputActions.InGame.PlacePiece.performed += PlacePiece;
+        Debug.Log("Adds Event!");
     }
 
     private void PlacePiece(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        /*
-        float radius = 0.5f;
-        selectedSquare = Physics.OverlapSphere(mouseWorldPos, radius, squareLayerMask);
-        Debug.Log("test!");
-        if (selectedSquare[0] != null)
-        {
-            Debug.Log("test2!");
-            xTurnToPlace = !xTurnToPlace;
-            if (xTurnToPlace)
-            {
-                currentPiece = xPiece;
-            }
-            else
-            {
-                currentPiece = oPiece;
-            }
-            selectedSquare[0].gameObject.GetComponent<PiecePlaced>().PlacePiece(currentPiece);
-        }
-        */
+       
         Debug.Log("Click");
         if (Physics.Raycast(placingray, out hit, Mathf.Infinity, squareLayerMask))
         {
-            Debug.Log("Should Find Ray");
-            xTurnToPlace = !xTurnToPlace;
-            if (xTurnToPlace)
+            test1 = hit.transform.parent.transform.parent.gameObject;
+            test2 = boardPieces[boardPieceToMoveTo];
+            //hit.transform.gameObject.GetComponentInParent<Transform>().gameObject.GetComponentInParent<Transform>().gameObject
+            if (hit.transform.parent.transform.parent.gameObject == boardPieces[boardPieceToMoveTo] || boardPieceToMoveTo == 0)
             {
-                currentPiece = xPiece;
+                if (!hit.transform.gameObject.GetComponent<PiecePlaced>().IsPiecePlaced())
+                {
+
+                    Debug.Log("Should Find Ray");
+                    xTurnToPlace = !xTurnToPlace;
+                    if (xTurnToPlace)
+                    {
+                        currentPiece = xPiece;
+                        turnText.text = "Turn: X";
+                    }
+                    else
+                    {
+                        currentPiece = oPiece;
+                        turnText.text = "Turn: O";
+                    }
+                    boardPieces[boardPieceToMoveTo].gameObject.GetComponent<WhichSquareWasClicked>().ChangeBackBoardColor(false);
+                    hit.transform.gameObject.GetComponent<PiecePlaced>().PlacePiece(currentPiece, out boardPieceToMoveTo);
+                    boardPieces[boardPieceToMoveTo].gameObject.GetComponent<WhichSquareWasClicked>().ChangeBackBoardColor(true);
+                    turnNumber++;
+                    turnNumberText.text = "Turn Number: " + turnNumber;
+                }
             }
-            else
-            {
-                currentPiece = oPiece;
-            }
-            hit.transform.gameObject.GetComponent<PiecePlaced>().PlacePiece(currentPiece);
         }
     }
-
+    private void Temporary()
+    {
+        Debug.Log("Click");
+        if (Physics.Raycast(placingray, out hit, Mathf.Infinity, squareLayerMask))
+        {
+            if (!hit.transform.gameObject.GetComponent<PiecePlaced>().IsPiecePlaced())
+            {
+                Debug.Log("Should Find Ray");
+                xTurnToPlace = !xTurnToPlace;
+                if (xTurnToPlace)
+                {
+                    currentPiece = xPiece;
+                    turnText.text = "Turn: X";
+                }
+                else
+                {
+                    currentPiece = oPiece;
+                    turnText.text = "Turn: O";
+                }
+                hit.transform.gameObject.GetComponent<PiecePlaced>().PlacePiece(currentPiece, out boardPieceToMoveTo);
+                boardPieces[boardPieceToMoveTo].gameObject.GetComponent<WhichSquareWasClicked>().ChangeBackBoardColor(true);
+                turnNumber++;
+                turnNumberText.text = "Turn Number: " + turnNumber;
+            }
+        }
+    }
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Temporary();
+        }
         mousePos = Input.mousePosition;
         mousePos.z = 32;
         mouseWorldPos = Camera.main.ScreenToWorldPoint(mousePos);
@@ -105,7 +142,6 @@ public class PlacePieces : MonoBehaviour
         }
         else
         {
-            Debug.Log("Should unselect square");
             if (selectedSquare != null)
             {
                 selectedSquare.GetComponent<PiecePlaced>().HideAllowability();
