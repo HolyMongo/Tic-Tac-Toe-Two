@@ -172,6 +172,12 @@ MonoBehaviour:
   backBoard: {fileID: 6886992300725299370}
   green: {fileID: 2100000, guid: 9649af53bc74ace44988e5da02042e8f, type: 2}
   defaultMaterial: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
+  boardIsWon: 0
+  boardBorders:
+  - {fileID: 891603813330478132}
+  - {fileID: 2374047556444116842}
+  - {fileID: 6502783483924469293}
+  - {fileID: 4783217600460648591}
 --- !u!1 &891603813330478132
 GameObject:
   m_ObjectHideFlags: 0
@@ -185,7 +191,7 @@ GameObject:
   - component: {fileID: 7313697012347779016}
   - component: {fileID: 5776634857818438489}
   m_Layer: 0
-  m_Name: Border
+  m_Name: Border 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -282,7 +288,7 @@ GameObject:
   - component: {fileID: 8364686974085783307}
   - component: {fileID: 3103318708027425708}
   m_Layer: 0
-  m_Name: Border (1)
+  m_Name: Border 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -643,7 +649,7 @@ GameObject:
   - component: {fileID: 3957596616377377069}
   - component: {fileID: 8850003106710801217}
   m_Layer: 0
-  m_Name: Border (3)
+  m_Name: Border 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -964,7 +970,7 @@ GameObject:
   - component: {fileID: 4750507132013238419}
   - component: {fileID: 2568040100012013309}
   m_Layer: 0
-  m_Name: Border (2)
+  m_Name: Border 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
 
 public class PlacePieces : MonoBehaviour
 {
@@ -12,9 +13,12 @@ public class PlacePieces : MonoBehaviour
     [SerializeField] private TextMeshProUGUI turnNumberText;
     [SerializeField] private TextMeshProUGUI turnText;
 
+    bool firstTurn = true;
 
     [SerializeField] private List<GameObject> boardPieces;
     [SerializeField] private int boardPieceToMoveTo;
+    [SerializeField] private int currentBoardPiece;
+    [SerializeField] private List<GameObject> boardBorders;
 
     private bool xTurnToPlace;
     private int turnNumber;
@@ -50,9 +54,72 @@ public class PlacePieces : MonoBehaviour
         Debug.Log("Adds Event!");
     }
 
+    public List<GameObject> ShareBoardPieces()
+    {
+        return boardPieces;
+    }
+
+    public void ChangeBoardBoardersToVictoryColor(Material victoryMaterial)
+    {
+        for (int i = 0; i < boardBorders.Count; i++)
+        {
+            boardBorders[i].GetComponent<MeshRenderer>().material = victoryMaterial;
+        }
+    }
+
     private void PlacePiece(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
        
+        Debug.Log("Click");
+        if (Physics.Raycast(placingray, out hit, Mathf.Infinity, squareLayerMask))
+        {
+            test1 = hit.transform.parent.transform.parent.gameObject;
+            test2 = boardPieces[boardPieceToMoveTo];
+            //hit.transform.gameObject.GetComponentInParent<Transform>().gameObject.GetComponentInParent<Transform>().gameObject
+            if (hit.transform.parent.transform.parent.gameObject == boardPieces[boardPieceToMoveTo] || firstTurn)
+            {
+                firstTurn = false;
+                if (!hit.transform.gameObject.GetComponent<PiecePlaced>().IsPiecePlaced())
+                {
+                    string whoseTurnIsIt;
+                    Debug.Log("Should Find Ray");
+                    xTurnToPlace = !xTurnToPlace;
+                    if (xTurnToPlace)
+                    {
+                        currentPiece = xPiece;
+                        whoseTurnIsIt = "X";
+                    }
+                    else
+                    {
+                        currentPiece = oPiece;
+                        whoseTurnIsIt = "O";
+                    }
+
+                    turnText.text = "Turn: " + whoseTurnIsIt;
+
+
+
+                    boardPieces[boardPieceToMoveTo].gameObject.GetComponent<WhichSquareWasClicked>().ChangeBackBoardColor(false);
+                    hit.transform.gameObject.GetComponent<PiecePlaced>().PlacePiece(currentPiece, out boardPieceToMoveTo, whoseTurnIsIt);
+                    Debug.Log("Test 1");
+                    if (boardPieces[boardPieceToMoveTo].gameObject.GetComponent<WhichSquareWasClicked>().isBoardFull())
+                    {
+                        Debug.Log("Test 4");
+                        boardPieceToMoveTo = currentBoardPiece;
+                    }
+                    gameObject.GetComponent<CheckForWin>().CheckIfWin(currentBoardPiece, whoseTurnIsIt);
+                    boardPieces[boardPieceToMoveTo].gameObject.GetComponent<WhichSquareWasClicked>().ChangeBackBoardColor(true);
+                    turnNumber++;
+                    turnNumberText.text = "Turn Number: " + turnNumber;
+                    currentBoardPiece = boardPieceToMoveTo;
+                }
+            }
+        }
+    }
+    /*
+    private void Temporary()
+    {
+
         Debug.Log("Click");
         if (Physics.Raycast(placingray, out hit, Mathf.Infinity, squareLayerMask))
         {
@@ -63,21 +130,23 @@ public class PlacePieces : MonoBehaviour
             {
                 if (!hit.transform.gameObject.GetComponent<PiecePlaced>().IsPiecePlaced())
                 {
-
+                    string whoseTurnIsIt;
                     Debug.Log("Should Find Ray");
                     xTurnToPlace = !xTurnToPlace;
                     if (xTurnToPlace)
                     {
                         currentPiece = xPiece;
-                        turnText.text = "Turn: X";
+                        whoseTurnIsIt = "X";
                     }
                     else
                     {
                         currentPiece = oPiece;
-                        turnText.text = "Turn: O";
+                        whoseTurnIsIt = "O";
                     }
+                    turnText.text = "Turn: " + whoseTurnIsIt;
+
                     boardPieces[boardPieceToMoveTo].gameObject.GetComponent<WhichSquareWasClicked>().ChangeBackBoardColor(false);
-                    hit.transform.gameObject.GetComponent<PiecePlaced>().PlacePiece(currentPiece, out boardPieceToMoveTo);
+                    hit.transform.gameObject.GetComponent<PiecePlaced>().PlacePiece(currentPiece, out boardPieceToMoveTo, whoseTurnIsIt);
                     boardPieces[boardPieceToMoveTo].gameObject.GetComponent<WhichSquareWasClicked>().ChangeBackBoardColor(true);
                     turnNumber++;
                     turnNumberText.text = "Turn Number: " + turnNumber;
@@ -85,38 +154,13 @@ public class PlacePieces : MonoBehaviour
             }
         }
     }
-    private void Temporary()
-    {
-        Debug.Log("Click");
-        if (Physics.Raycast(placingray, out hit, Mathf.Infinity, squareLayerMask))
-        {
-            if (!hit.transform.gameObject.GetComponent<PiecePlaced>().IsPiecePlaced())
-            {
-                Debug.Log("Should Find Ray");
-                xTurnToPlace = !xTurnToPlace;
-                if (xTurnToPlace)
-                {
-                    currentPiece = xPiece;
-                    turnText.text = "Turn: X";
-                }
-                else
-                {
-                    currentPiece = oPiece;
-                    turnText.text = "Turn: O";
-                }
-                hit.transform.gameObject.GetComponent<PiecePlaced>().PlacePiece(currentPiece, out boardPieceToMoveTo);
-                boardPieces[boardPieceToMoveTo].gameObject.GetComponent<WhichSquareWasClicked>().ChangeBackBoardColor(true);
-                turnNumber++;
-                turnNumberText.text = "Turn Number: " + turnNumber;
-            }
-        }
-    }
+    */
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Temporary();
-        }
+        //if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    Temporary();
+        //}
         mousePos = Input.mousePosition;
         mousePos.z = 32;
         mouseWorldPos = Camera.main.ScreenToWorldPoint(mousePos);
